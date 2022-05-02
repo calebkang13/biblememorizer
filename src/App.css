@@ -15,6 +15,25 @@
 .textArea{
   margin-top: 50px;
   margin-left: 20px;
-  height: 500px !important;
+  min-height: 500px;
   width: 1000px;
+  overflow: scroll;
+}
+
+.submitButton{
+  margin-top: 20px !important;
+  margin-left: 950px !important;
+}
+
+.errors{
+  margin-left: 20px;
+  margin-top: 20px;
+  white-space: pre-line;
+  width: 60%;
+  height: 300;
+}
+
+.datagrid{
+  height: 800px;
+  width: 150%;
 }
