@@ -51,6 +51,9 @@ function App() {
               <MenuItem value={"Mark"}>Mark</MenuItem>
               <MenuItem value={"Luke"}>Luke</MenuItem>
               <MenuItem value={"John"}>John</MenuItem>
+              <MenuItem value={"Romans"}>Romans</MenuItem>
+              <MenuItem value={"1_Corinthians"}>1 Corinthians</MenuItem>
+              <MenuItem value={"2_Corinthians"}>2_Corinthians</MenuItem>
               <MenuItem value={"Psalms"}>Psalms</MenuItem>
             </Select>
           </FormControl>
