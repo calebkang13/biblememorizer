@@ -8,15 +8,19 @@
   margin-top: 20px !important; 
 }
 
-.selectField{
-  width:150px;
+#enter-verses-label{
+  overflow: visible;
+}
+#enter-verses{
+  overflow: visible;
+  width: 1000px;
 }
 
 .textArea{
   margin-top: 50px;
   margin-left: 20px;
   min-height: 500px;
-  width: 1000px;
+  width: 1020px;
   overflow: scroll;
 }
 
