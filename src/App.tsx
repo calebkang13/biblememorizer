@@ -312,7 +312,6 @@ function App() {
           onClick={async () => {
             const response = await getVerseList(verseSelection);
             const allText = response.flatMap(section=> section.verses.flatMap((verse: { text: any; })=> verse.text))
-            // const response = await import('./assets/biblebooks/' + book + '.json');
             var textArr = text!.split('\n');
             var rowArray: any[] = [];
             for(let row = 0; row < allText.length; row++){
