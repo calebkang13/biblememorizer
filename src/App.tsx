@@ -311,19 +311,20 @@ function App() {
           className="submitButton" 
           onClick={async () => {
             const response = await getVerseList(verseSelection);
-            const allText = response.flatMap(section=> section.verses.flatMap((verse: { text: any; })=> verse.text))
+            const allApiText = response.flatMap(section=> section.verses.flatMap((verse: { text: any; })=> verse.text))
+            const allVerseReferences = response.flatMap(section=> section.verses.flatMap((verse: { ref: any; })=> verse.ref))
             var textArr = text!.split('\n');
             var rowArray: any[] = [];
-            for(let row = 0; row < allText.length; row++){
-              if(row >= allText.length){
+            for(let row = 0; row < allApiText.length; row++){
+              if(row >= allApiText.length){
                 break;
               }
               var userText = row < textArr.length ? textArr[row].replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase() : "";
-              var verseText = allText[row].replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+              var verseText = allApiText[row].replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
               if(userText !== verseText){
                 setSuccess(false);
                 var diff = <StringDiff oldValue={userText} newValue={verseText} />;
-                rowArray.push({id: row, verse: (row+1), diff: diff});
+                rowArray.push({id: row, verse: (allVerseReferences[row]), diff: diff});
               }
             }
             if(rowArray.length <= 0){
