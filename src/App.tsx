@@ -317,6 +317,7 @@ function App() {
           variant="contained" 
           className="submitButton" 
           onClick={async () => {
+            setRows([])
             const response = await getVerseList(verseSelection);
             setAllApiText(response.flatMap(section => section.verses.flatMap((verse: { text: any; }) => verse.text)))
             const VerseReferences = response.flatMap(section => section.verses.flatMap((verse: { ref: any; }) => verse.ref))
@@ -329,6 +330,7 @@ function App() {
           {allVerseReferences.map((reference: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: number) => (
             <div>
               <TextField 
+                autoComplete="off"
                 id="enter-verses"
                 key={index}
                 label={reference}
