@@ -15,6 +15,13 @@
   overflow: visible;
   width: 1000px;
 }
+#enter-verses-label{
+  overflow: visible;
+}
+#enter-verses{
+  overflow: visible;
+  width: 1000px;
+}
 
 .textArea{
   margin-top: 50px;
@@ -40,4 +47,12 @@
 .datagrid{
   height: 800px;
   width: 150%;
+}
+
+div.formControl div div div {
+  margin-bottom: 10px;
+}
+
+.stringDiff {
+  margin-bottom: 10px;
 }

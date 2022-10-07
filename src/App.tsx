@@ -6,12 +6,11 @@ import {StringDiff} from 'react-string-diff';
 
 
 function App() {
-  const [verseSelection, setVerseSelection] = useState<string>("1");
-  const [text, setText] = useState<string>();
-  const [rows, setRows] = useState<GridRowsProp>([]);
-  const [success, setSuccess] = useState<boolean>(false);
-  const columns: GridColDef[] = [
-    { field: 'verse', headerName: 'Verse', width:100},
+  const [verseSelection, setVerseSelection] = useState<string>("");
+  const [allApiText, setAllApiText] = useState<any>([]);
+  const [allVerseReferences, setAllVerseReferences] = useState<any>([]);
+  const [rows, setRows] = useState<any>([]);
+    const columns: GridColDef[] = [
     { field: 'diff', 
       headerName: 'Difference', 
       flex:1,
@@ -274,6 +273,23 @@ function App() {
         console.log(error)
       }
   }
+  const checkVerse = (index: number, text: string) => {
+    var userText = text.replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+    var verseText = allApiText[index].replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (userText !== verseText && userText !=="") {
+      console.log(index, userText, verseText)
+      setRows([...rows, { id: index, diff: <StringDiff className='stringDiff' key={index} oldValue={userText} newValue={verseText} /> }]);
+    } else if (userText !=="") {
+      setRows([...rows, {id: index, diff: "Correct!"}]);
+    }
+  }
+  const renderVerseDiff = (index: number) => {
+    const result: any[] = rows.filter((e: { id: number; }) => e.id == index);
+    if (result.length !== 0) {
+      return result[result.length-1].diff
+    }
+    return ""
+  }
   return (
     <div className="App">
       <header className="App-header">
@@ -282,9 +298,6 @@ function App() {
           <Typography style={{marginRight: "10px"}}>
             Bible Memorizer
           </Typography>    
-          {/* <Button variant="outlined" color="inherit" href="https://google.com"> */}
-            {/* How To Use */}
-          {/* </Button> */}
           </Toolbar>
         </AppBar>
       </header>
@@ -300,49 +313,37 @@ function App() {
               onBlur={(event) => setVerseSelection(event.currentTarget.value)}/>
           </FormControl>
         </div>
-        <div>
-          <TextareaAutosize 
-            className="textArea"
-            onBlur={(event) => setText(event.currentTarget.value)}
-          />
-          <br />
-          <Button 
+        <Button 
           variant="contained" 
           className="submitButton" 
           onClick={async () => {
             const response = await getVerseList(verseSelection);
-            const allApiText = response.flatMap(section=> section.verses.flatMap((verse: { text: any; })=> verse.text))
-            const allVerseReferences = response.flatMap(section=> section.verses.flatMap((verse: { ref: any; })=> verse.ref))
-            var textArr = text!.split('\n');
-            var rowArray: any[] = [];
-            for(let row = 0; row < allApiText.length; row++){
-              if(row >= allApiText.length){
-                break;
-              }
-              var userText = row < textArr.length ? textArr[row].replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase() : "";
-              var verseText = allApiText[row].replace(/[^a-zA-Z ]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
-              if(userText !== verseText){
-                setSuccess(false);
-                var diff = <StringDiff oldValue={userText} newValue={verseText} />;
-                rowArray.push({id: row, verse: (allVerseReferences[row]), diff: diff});
-              }
-            }
-            if(rowArray.length <= 0){
-              setSuccess(true);
-            }
-            setRows(rowArray);
-
+            setAllApiText(response.flatMap(section => section.verses.flatMap((verse: { text: any; }) => verse.text)))
+            const VerseReferences = response.flatMap(section => section.verses.flatMap((verse: { ref: any; }) => verse.ref))
+            setAllVerseReferences(VerseReferences)
           }}>
-            Submit
-          </Button>
-        </div>
-        <br />
-        <div className="errors">
-          {success ? "Success! You've made no errors." : ""}
-          <div className="datagrid">
+            Load Verses
+        </Button>
+        
+        <FormControl className="formControl">
+          {allVerseReferences.map((reference: boolean | React.ReactChild | React.ReactFragment | React.ReactPortal | null | undefined, index: number) => (
+            <div>
+              <TextField 
+                id="enter-verses"
+                key={index}
+                label={reference}
+                variant="outlined"
+                size="medium"
+                onBlur={(event) => checkVerse(index, event.currentTarget.value)}
+              />
+              {renderVerseDiff(index)}
+            </div>
+            
+            ))}
+        </FormControl>
+          {/* <div className="datagrid">
           <DataGrid rows={rows} columns={columns}/>
-          </div>
-        </div>
+          </div> */}
       </body>
     </div>
   );
