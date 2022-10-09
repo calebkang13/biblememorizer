@@ -10,7 +10,7 @@ function App() {
   const [allApiText, setAllApiText] = useState<any>([]);
   const [allVerseReferences, setAllVerseReferences] = useState<any>([]);
   const [rows, setRows] = useState<any>([]);
-    const columns: GridColDef[] = [
+  const columns: GridColDef[] = [
     { field: 'diff', 
       headerName: 'Difference', 
       flex:1,
@@ -281,6 +281,10 @@ function App() {
       setRows([...rows, { id: index, diff: <StringDiff className='stringDiff' key={index} oldValue={userText} newValue={verseText} /> }]);
     } else if (userText !=="") {
       setRows([...rows, {id: index, diff: "Correct!"}]);
+    } else {
+      if (rows.filter((e: { id: number; }) => e.id == index)) {
+        setRows(rows.filter((e: { id: number; }) => e.id !== index))
+      }
     }
   }
   const renderVerseDiff = (index: number) => {
