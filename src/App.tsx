@@ -117,54 +117,50 @@ function App() {
           }
         });
 
-        // Check if colons and dashes in section
-        var countDash = (section.match(/-/g) || []).length;
-        var countColon = (section.match(/:/g) || []).length;
+        var match = section.match(/(?:(\d+):(\d+)-(\d+)+:(\d+))|(?:(\d+):(\d+)-(\d+))|(?:(\d+)-(\d+):(\d+))|(?:(\d+)-(\d+))|(?:(\d+):(\d+))|(\d+)/) || [""]
 
-        // Initialize vars
         var chapterNum
-        var start
-        var end
         var sectionTitle = true
 
-        // John 5:12-6:10
-        if (countDash == 1 && countColon == 2) {
-          // Split into chapter and verse
-          [chapterNum, start] = section.split("-")[0].split(':');
-          await getVerses({ bookName, chapterNum, start, sectionTitle });
-
-          [chapterNum, end] = section.split("-")[1].split(':');
-          start = 1
-          await getVerses({ bookName, chapterNum, start, end, sectionTitle });
+        // John 1:2-3:4
+        // John (1):(2)-(3):(4)
+        if (match[1]) {
+          await getVerses({ bookName, chapterNum: match[1], start: match[2], sectionTitle });
+          await getVerses({ bookName, chapterNum: match[3], end: match[4], sectionTitle });
         }
 
-        // Matt. 5:18-20
-        else if (countDash == 1 && countColon == 1) {
-          [chapterNum, start] = section.split("-")[0].split(':');
-          end = section.split("-")[1];
-          await getVerses({ bookName, chapterNum, start, end, sectionTitle });
+        // Matt. 5:6-7
+        // Matt. (5):(6)-(7)
+        else if (match[5]) {
+          await getVerses({ bookName, chapterNum: match[5], start: match[6], end: match[7], sectionTitle });
         }
-
-        // John 3-4
-        else if (countDash == 1 && countColon == 0) {
-          var chapterStart = parseInt(section.split("-")[0])
-          var chapterEnd = parseInt(section.split("-")[1])
-          for (chapterNum = chapterStart; chapterNum <= chapterEnd; chapterNum++) {
+        
+        // Matt. 8-9:10
+        // Matt. (8)-(9):(10)
+        else if (match[8]) {
+          for (chapterNum = parseInt(match[8]); chapterNum <= parseInt(match[9])-1; chapterNum++) {
+            await getVerses({ bookName, chapterNum });
+          }
+          await getVerses({ bookName, chapterNum: match[9], end: match[10], sectionTitle });
+        }
+        // John 11-12
+        // John (11)-(12)
+        else if (match[11]) {
+          for (chapterNum = parseInt(match[11]); chapterNum <= parseInt(match[12]); chapterNum++) {
             await getVerses({ bookName, chapterNum });
           }
         }
 
-        // Matthew 2:4;
-        else if (countDash == 0 && countColon == 1) {
-          [chapterNum, start] = section.split(":");
-          end = start
-          await getVerses({ bookName, chapterNum, start, end, sectionTitle });
+        // Matthew 13:14
+        // Matthew (13):(14)
+        else if (match[13]) {
+          await getVerses({ bookName, chapterNum: match[13], start: match[14], end: match[14], sectionTitle });
         }
 
-        // Matt. 1
-        else if (countDash == 0 && countColon == 0) {
-          chapterNum = section;
-          await getVerses({ bookName, chapterNum });
+        // Matt. 15
+        // Matt. (15)
+        else if (match[15]) {
+          await getVerses({ bookName, chapterNum: match[15] });
         }
       }
     return sections;
@@ -196,7 +192,12 @@ function App() {
         var title = bookName + " " + chapterNum
       }
       else {
-        title = bookName + " " + chapterNum + ":" + start + "-" + end
+        if (start != end) {
+          title = bookName + " " + chapterNum + ":" + start + "-" + end
+        } else {
+          title = bookName + " " + chapterNum + ":" + start
+        }
+
       }
 
       //Try catch block to log and capture errors
@@ -220,6 +221,8 @@ function App() {
           // Make axios request ie. Genesis 4:5-20 https://api.lsm.org/recver.php?String=Genesis 4:5-20&Out=json
           const response = await axios.get(`https://api.lsm.org/recver.php?String=${bookName} ${chapterNum}:${start}-${next}&Out=json`)
           var data = response.data
+          console.log(`API requested: ${bookName} ${chapterNum}:${start}-${next}`)
+          console.log(response)
 
           // The response format is a "\[ *verse* \]" string returned for "Rom. 16:24", "Mark 9:44", and "Mark 9:46" for json parsing
           // The replace function will look for all backslashes and replace them with nothing
@@ -323,6 +326,7 @@ function App() {
           onClick={async () => {
             setRows([])
             const response = await getVerseList(verseSelection);
+            console.log(response)
             setAllApiText(response.flatMap(section => section.verses.flatMap((verse: { text: any; }) => verse.text)))
             const VerseReferences = response.flatMap(section => section.verses.flatMap((verse: { ref: any; }) => verse.ref))
             setAllVerseReferences(VerseReferences)
